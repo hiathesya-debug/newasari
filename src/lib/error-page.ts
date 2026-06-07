@@ -1,79 +1,30 @@
 export function renderErrorPage(): string {
-  return `
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Error</title>
-      <style>
-        * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
-        }
-        body {
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          min-height: 100vh;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 20px;
-        }
-        .error-container {
-          background: white;
-          border-radius: 8px;
-          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-          max-width: 500px;
-          width: 100%;
-          padding: 40px;
-          text-align: center;
-        }
-        .error-code {
-          font-size: 72px;
-          font-weight: bold;
-          color: #667eea;
-          margin-bottom: 10px;
-        }
-        .error-title {
-          font-size: 24px;
-          font-weight: 600;
-          color: #333;
-          margin-bottom: 10px;
-        }
-        .error-message {
-          font-size: 16px;
-          color: #666;
-          line-height: 1.6;
-          margin-bottom: 30px;
-        }
-        .error-button {
-          display: inline-block;
-          background: #667eea;
-          color: white;
-          text-decoration: none;
-          padding: 12px 30px;
-          border-radius: 6px;
-          font-size: 14px;
-          font-weight: 600;
-          transition: background 0.3s ease;
-        }
-        .error-button:hover {
-          background: #764ba2;
-        }
-      </style>
-    </head>
-    <body>
-      <div class="error-container">
-        <div class="error-code">500</div>
-        <div class="error-title">Internal Server Error</div>
-        <div class="error-message">
-          Something went wrong on our end. Please try refreshing the page or contact support if the problem persists.
-        </div>
-        <a href="/" class="error-button">Go Home</a>
+  return `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>This page didn't load</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      body { font: 15px/1.5 system-ui, -apple-system, sans-serif; background: #fafafa; color: #111; display: grid; place-items: center; min-height: 100vh; margin: 0; padding: 1.5rem; }
+      .card { max-width: 28rem; width: 100%; text-align: center; padding: 2rem; }
+      h1 { font-size: 1.25rem; margin: 0 0 0.5rem; }
+      p { color: #4b5563; margin: 0 0 1.5rem; }
+      .actions { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; }
+      a, button { padding: 0.5rem 1rem; border-radius: 0.375rem; font: inherit; cursor: pointer; text-decoration: none; border: 1px solid transparent; }
+      .primary { background: #111; color: #fff; }
+      .secondary { background: #fff; color: #111; border-color: #d1d5db; }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>This page didn't load</h1>
+      <p>Something went wrong on our end. You can try refreshing or head back home.</p>
+      <div class="actions">
+        <button class="primary" onclick="location.reload()">Try again</button>
+        <a class="secondary" href="/">Go home</a>
       </div>
-    </body>
-    </html>
-  `;
+    </div>
+  </body>
+</html>`;
 }
