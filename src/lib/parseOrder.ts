@@ -97,7 +97,7 @@ export const IG_HANDLE = "asari.bouquetflowerbdg";
 
 export function buildWaOrderUrl(productName: string): string {
   const msg = ORDER_TEMPLATE.replace("{PRODUCT}", productName);
-  return `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`;
+  return `https://wa.me/${WA_NUMBER}?&text=Haiii%20kakk!%20Aku%20tertarik%20dengan%20(Nama%20Produk)`;
 }
 
 export function buildIgUrl(): string {

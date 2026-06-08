@@ -1,4 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { Eye } from "lucide-react";
+import { useAuth, isOwner } from "@/lib/auth";
+import { useEffect } from "react";
 import { ORDER_TEMPLATE } from "@/lib/parseOrder";
 
 export const Route = createFileRoute("/admin/sop")({
@@ -6,10 +9,37 @@ export const Route = createFileRoute("/admin/sop")({
   component: SOPPage,
 });
 
+function ViewOnlyBanner() {
+  return (
+    <div className="flex items-start gap-3 px-4 py-3 rounded-lg border-l-[3px] border-[var(--asari-gold)]"
+      style={{ backgroundColor: "rgba(242,218,172,0.6)" }}>
+      <Eye className="h-4 w-4 text-[var(--asari-gold)] shrink-0 mt-0.5" />
+      <p className="text-[13px] text-[var(--asari-charcoal)]">
+        <span className="font-semibold">View Only</span> — You do not have permission to edit this page.
+        Contact the owner to make changes.
+      </p>
+    </div>
+  );
+}
+
 function SOPPage() {
+  const user = useAuth();
+  const navigate = useNavigate();
+  const owner = isOwner(user);
+
+  // Redirect non-admin users
+  useEffect(() => {
+    if (user !== undefined && user !== null && user.role === "customer") {
+      navigate({ to: "/admin" });
+    }
+  }, [user, navigate]);
+
   return (
     <div className="space-y-8 max-w-4xl">
       <h1 className="font-display text-4xl">Standard Operating Procedure</h1>
+
+      {!owner && <ViewOnlyBanner />}
+
       <p className="text-sm text-[var(--asari-charcoal)]/70">
         Panduan operasional untuk tim Asari Bouquet &amp; Flower.
       </p>
@@ -71,8 +101,8 @@ function SOPPage() {
       </Sop>
 
       <Sop title="7. FAQ Internal">
-        <p><strong>Q: Pelanggan request bunga di luar katalog?</strong><br/>A: Tawarkan opsi Custom Order — minta brief warna, tema, dan budget.</p>
-        <p className="mt-2"><strong>Q: Stok habis tapi pelanggan tetap order?</strong><br/>A: Tawarkan produk serupa atau jadwalkan ulang sesuai ketersediaan.</p>
+        <p><strong>Q: Pelanggan request bunga di luar katalog?</strong><br />A: Tawarkan opsi Custom Order — minta brief warna, tema, dan budget.</p>
+        <p className="mt-2"><strong>Q: Stok habis tapi pelanggan tetap order?</strong><br />A: Tawarkan produk serupa atau jadwalkan ulang sesuai ketersediaan.</p>
       </Sop>
     </div>
   );

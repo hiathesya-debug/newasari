@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowLeft, MessageCircle, Printer } from "lucide-react";
+import { ArrowLeft, MessageCircle } from "lucide-react";
 import { ORDERS, OrderStatus } from "@/lib/mockData";
 import { formatRp } from "@/lib/format";
 
@@ -50,12 +50,6 @@ function OrderDetail() {
           >
             <MessageCircle className="h-4 w-4" /> Kirim Notif WA
           </a>
-          <button
-            onClick={() => window.print()}
-            className="border border-[var(--asari-gold)] text-[var(--asari-gold)] px-4 py-2 rounded text-xs uppercase tracking-widest inline-flex items-center gap-2"
-          >
-            <Printer className="h-4 w-4" /> Cetak
-          </button>
         </div>
       </div>
       <div className="h-px bg-[var(--asari-gold)]" />

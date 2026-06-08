@@ -25,6 +25,7 @@ import { Route as AdminWebsiteRouteImport } from './routes/admin.website'
 import { Route as AdminSopRouteImport } from './routes/admin.sop'
 import { Route as AdminProductsRouteImport } from './routes/admin.products'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
+import { Route as AdminAccountsRouteImport } from './routes/admin.accounts'
 import { Route as AdminOrdersIndexRouteImport } from './routes/admin.orders.index'
 import { Route as AccountOrdersIndexRouteImport } from './routes/account.orders.index'
 import { Route as AdminProductsNewRouteImport } from './routes/admin.products.new'
@@ -113,6 +114,11 @@ const AdminLoginRoute = AdminLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminAccountsRoute = AdminAccountsRouteImport.update({
+  id: '/accounts',
+  path: '/accounts',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminOrdersIndexRoute = AdminOrdersIndexRouteImport.update({
   id: '/orders/',
   path: '/orders/',
@@ -159,6 +165,7 @@ export interface FileRoutesByFullPath {
   '/reviews': typeof ReviewsRoute
   '/signup': typeof SignupRoute
   '/terms': typeof TermsRoute
+  '/admin/accounts': typeof AdminAccountsRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/products': typeof AdminProductsRouteWithChildren
   '/admin/sop': typeof AdminSopRoute
@@ -182,6 +189,7 @@ export interface FileRoutesByTo {
   '/reviews': typeof ReviewsRoute
   '/signup': typeof SignupRoute
   '/terms': typeof TermsRoute
+  '/admin/accounts': typeof AdminAccountsRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/products': typeof AdminProductsRouteWithChildren
   '/admin/sop': typeof AdminSopRoute
@@ -208,6 +216,7 @@ export interface FileRoutesById {
   '/reviews': typeof ReviewsRoute
   '/signup': typeof SignupRoute
   '/terms': typeof TermsRoute
+  '/admin/accounts': typeof AdminAccountsRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/products': typeof AdminProductsRouteWithChildren
   '/admin/sop': typeof AdminSopRoute
@@ -235,6 +244,7 @@ export interface FileRouteTypes {
     | '/reviews'
     | '/signup'
     | '/terms'
+    | '/admin/accounts'
     | '/admin/login'
     | '/admin/products'
     | '/admin/sop'
@@ -258,6 +268,7 @@ export interface FileRouteTypes {
     | '/reviews'
     | '/signup'
     | '/terms'
+    | '/admin/accounts'
     | '/admin/login'
     | '/admin/products'
     | '/admin/sop'
@@ -283,6 +294,7 @@ export interface FileRouteTypes {
     | '/reviews'
     | '/signup'
     | '/terms'
+    | '/admin/accounts'
     | '/admin/login'
     | '/admin/products'
     | '/admin/sop'
@@ -425,6 +437,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLoginRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/accounts': {
+      id: '/admin/accounts'
+      path: '/accounts'
+      fullPath: '/admin/accounts'
+      preLoaderRoute: typeof AdminAccountsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/orders/': {
       id: '/admin/orders/'
       path: '/orders'
@@ -507,6 +526,7 @@ const AdminProductsRouteWithChildren = AdminProductsRoute._addFileChildren(
 )
 
 interface AdminRouteChildren {
+  AdminAccountsRoute: typeof AdminAccountsRoute
   AdminLoginRoute: typeof AdminLoginRoute
   AdminProductsRoute: typeof AdminProductsRouteWithChildren
   AdminSopRoute: typeof AdminSopRoute
@@ -518,6 +538,7 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminAccountsRoute: AdminAccountsRoute,
   AdminLoginRoute: AdminLoginRoute,
   AdminProductsRoute: AdminProductsRouteWithChildren,
   AdminSopRoute: AdminSopRoute,

@@ -1,6 +1,8 @@
 import { Product } from "@/lib/mockData";
 import { formatRp } from "@/lib/format";
 import { buildIgUrl, buildWaOrderUrl } from "@/lib/parseOrder";
+import iconWa from "@/assets/icon/ICON=WHATSAPP.svg";
+import iconInsta from "@/assets/icon/ICON=INSTAGRAM.svg";
 
 export function ProductCard({ product }: { product: Product }) {
   return (
@@ -15,35 +17,41 @@ export function ProductCard({ product }: { product: Product }) {
         {!product.inStock && (
           <div
             className="absolute inset-0 flex items-center justify-center"
-            style={{ backgroundColor: "rgba(237,162,143,0.6)" }}
+            style={{ backgroundColor: "rgba(182,104,120,0.6)" }}
           >
             <span className="font-display italic text-white text-xl">Out of Stock.</span>
           </div>
         )}
       </div>
       <div className="mt-4 flex-1">
-        <h3 className="font-display text-lg text-[var(--asari-charcoal)]">{product.name}</h3>
-        <p className="text-sm text-[var(--asari-gold)] mt-1 font-medium">
+        <h3 className="font-display text-2xl text-[var(--asari-charcoal)]">{product.name}</h3>
+        <p className="font-body font-bold text-sm text-[var(--asari-gold)] mt-1">
           {formatRp(product.price)}
         </p>
       </div>
       {product.inStock && (
         <div className="mt-3 grid grid-cols-2 gap-2">
+          {/* Order via WhatsApp */}
           <a
             href={buildWaOrderUrl(product.name)}
             target="_blank"
             rel="noreferrer"
-            className="text-center text-xs uppercase tracking-wider py-2 rounded-sm bg-[var(--asari-gold)] text-white hover:bg-[var(--asari-gold-light)] transition-colors"
+            className="font-body font-semibold inline-flex items-center justify-center gap-2 text-sm py-2 rounded-sm text-white transition-opacity hover:opacity-85"
+            style={{ backgroundColor: "#D9A84E" }}
           >
-            Order 📱
+            <img src={iconWa} alt="WhatsApp" className="h-4 w-4 brightness-0 invert" />
+            Order
           </a>
+          {/* Order via Instagram */}
           <a
             href={buildIgUrl()}
             target="_blank"
             rel="noreferrer"
-            className="text-center text-xs uppercase tracking-wider py-2 rounded-sm bg-[var(--asari-coral)] text-white hover:opacity-90 transition-opacity"
+            className="font-body font-semibold inline-flex items-center justify-center gap-2 text-sm py-2 rounded-sm text-white transition-opacity hover:opacity-85"
+            style={{ backgroundColor: "#B66878" }}
           >
-            Order 📷
+            <img src={iconInsta} alt="Instagram" className="h-4 w-4 brightness-0 invert" />
+            Order
           </a>
         </div>
       )}

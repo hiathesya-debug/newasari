@@ -4,9 +4,167 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Asari Bouquet & Flower — Design System */
+/* ─── Self-hosted Fonts ─── */
 
-/* Display font: Cormorant Garamond (web fallback for Perpetua). Body: Urbanist. Both loaded via Google Fonts in __root.tsx. */
+/* Perpetua */
+@font-face {
+  font-family: "Perpetua";
+  src: url("./assets/font/perpetua/Perpetua-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Perpetua";
+  src: url("./assets/font/perpetua/Perpetua-Italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Perpetua";
+  src: url("./assets/font/perpetua/Perpetua-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Perpetua";
+  src: url("./assets/font/perpetua/Perpetua-Bold-Italic.woff2") format("woff2");
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Urbanist */
+@font-face {
+  font-family: "Urbanist";
+  src: url("./assets/font/urbanist/Urbanist-Thin.woff2") format("woff2");
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Urbanist";
+  src: url("./assets/font/urbanist/Urbanist-ThinItalic.woff2") format("woff2");
+  font-weight: 100;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Urbanist";
+  src: url("./assets/font/urbanist/Urbanist-ExtraLight.woff2") format("woff2");
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Urbanist";
+  src: url("./assets/font/urbanist/Urbanist-ExtraLightItalic.woff2") format("woff2");
+  font-weight: 200;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Urbanist";
+  src: url("./assets/font/urbanist/Urbanist-Light.woff2") format("woff2");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Urbanist";
+  src: url("./assets/font/urbanist/Urbanist-LightItalic.woff2") format("woff2");
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Urbanist";
+  src: url("./assets/font/urbanist/Urbanist-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Urbanist";
+  src: url("./assets/font/urbanist/Urbanist-Italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Urbanist";
+  src: url("./assets/font/urbanist/Urbanist-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Urbanist";
+  src: url("./assets/font/urbanist/Urbanist-MediumItalic.woff2") format("woff2");
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Urbanist";
+  src: url("./assets/font/urbanist/Urbanist-SemiBold.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Urbanist";
+  src: url("./assets/font/urbanist/Urbanist-SemiBoldItalic.woff2") format("woff2");
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Urbanist";
+  src: url("./assets/font/urbanist/Urbanist-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Urbanist";
+  src: url("./assets/font/urbanist/Urbanist-BoldItalic.woff2") format("woff2");
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Urbanist";
+  src: url("./assets/font/urbanist/Urbanist-ExtraBold.woff2") format("woff2");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Urbanist";
+  src: url("./assets/font/urbanist/Urbanist-ExtraBoldItalic.woff2") format("woff2");
+  font-weight: 800;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Urbanist";
+  src: url("./assets/font/urbanist/Urbanist-Black.woff2") format("woff2");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Urbanist";
+  src: url("./assets/font/urbanist/Urbanist-BlackItalic.woff2") format("woff2");
+  font-weight: 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* ─── Design System ─── */
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
@@ -47,7 +205,7 @@
   --color-asari-off-white: var(--asari-off-white);
   --color-asari-coral: var(--asari-coral);
 
-  --font-display: "Cormorant Garamond", "Perpetua", "Didot", Georgia, serif;
+  --font-display: "Perpetua", "Cormorant Garamond", Georgia, serif;
   --font-body: "Urbanist", system-ui, -apple-system, sans-serif;
 }
 

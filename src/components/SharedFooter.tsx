@@ -1,28 +1,32 @@
-import { Instagram } from "lucide-react";
+import iconInsta from "@/assets/icon/ICON=INSTAGRAM.svg";
+import iconTiktok from "@/assets/icon/ICON=TIKTOK.svg";
+import iconWa from "@/assets/icon/ICON=WHATSAPP.svg";
+import logoImg from "@/assets/icon/logo.png";
 
 export function SharedFooter() {
   return (
-    <footer className="bg-[var(--asari-brown)] text-[var(--asari-off-white)] mt-16">
+    <footer
+      className="text-white mt-16"
+      style={{ background: "linear-gradient(to right, #D9A84E, #EDA28F)" }}
+    >
       <div className="max-w-7xl mx-auto px-6 py-12 grid gap-10 md:grid-cols-3">
+        {/* Kolom 1 — Logo & Deskripsi */}
         <div>
-          <div className="flex flex-col leading-none">
-            <span className="font-display italic text-4xl text-[var(--asari-off-white)]">
-              Asari
-            </span>
-            <span className="text-[10px] tracking-[0.3em] uppercase mt-1 text-[var(--asari-champagne)]">
-              bouquet &amp; flower
-            </span>
-          </div>
-          <p className="mt-5 text-sm leading-relaxed text-[var(--asari-champagne)] max-w-xs">
+          <img
+            src={logoImg}
+            alt="Asari Bouquet & Flower"
+            className="h-16 w-auto object-contain brightness-0 invert mb-4"
+          />
+          <p className="mt-2 text-sm leading-relaxed text-white/90 max-w-xs">
             Florist rumahan di Antapani, Bandung. Setiap rangkaian kami kerjakan
             dengan tangan, dari hati, untuk momen istimewamu.
           </p>
         </div>
+
+        {/* Kolom 2 — Category */}
         <div>
-          <h4 className="font-display text-xl mb-4 text-[var(--asari-off-white)]">
-            Category
-          </h4>
-          <ul className="space-y-2 text-sm text-[var(--asari-champagne)]">
+          <h4 className="font-display text-xl mb-4 text-white">Category</h4>
+          <ul className="space-y-2 text-sm text-white/90">
             <li>Freshest Series</li>
             <li>Fresh Bouquet</li>
             <li>Hand Bouquet</li>
@@ -30,22 +34,30 @@ export function SharedFooter() {
             <li>Custom Order</li>
           </ul>
         </div>
+
+        {/* Kolom 3 — Contact */}
         <div>
-          <h4 className="font-display text-xl mb-4 text-[var(--asari-off-white)]">
-            Contact Us
-          </h4>
-          <ul className="space-y-2 text-sm text-[var(--asari-champagne)]">
+          <h4 className="font-display text-xl mb-4 text-white">Contact Us</h4>
+          <ul className="space-y-3 text-sm text-white/90">
             <li className="flex items-center gap-2">
-              <Instagram className="h-4 w-4" /> @asari.bouquetflowerbdg
+              <img src={iconInsta} alt="Instagram" className="h-5 w-5 object-contain brightness-0 invert" />
+              @asari.bouquetflowerbdg
             </li>
-            <li>TikTok: @asari.bouquetflowerbdg</li>
-            <li>WA: +62 878-6391-2739</li>
-            <li>Antapani, Bandung</li>
+            <li className="flex items-center gap-2">
+              <img src={iconTiktok} alt="TikTok" className="h-5 w-5 object-contain brightness-0 invert" />
+              @asari.bouquetflowerbdg
+            </li>
+            <li className="flex items-center gap-2">
+              <img src={iconWa} alt="WhatsApp" className="h-5 w-5 object-contain brightness-0 invert" />
+              +62 878-6391-2739
+            </li>
+            <li className="pl-7">Antapani, Bandung</li>
           </ul>
         </div>
       </div>
-      <div className="border-t border-[var(--asari-champagne)]/20">
-        <div className="max-w-7xl mx-auto px-6 py-4 text-xs text-[var(--asari-champagne)]/80 text-center">
+
+      <div className="border-t border-white/20">
+        <div className="max-w-7xl mx-auto px-6 py-4 text-xs text-white/80 text-center">
           © {new Date().getFullYear()} Asari Bouquet &amp; Flower. All rights reserved.
         </div>
       </div>

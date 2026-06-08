@@ -1,42 +1,55 @@
-// Real auth using Lovable Cloud (Supabase). Backwards-compatible useAuth() API.
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-export type Role = "admin" | "staff" | "customer";
+export type Role = "owner" | "staff" | "customer";
+
 export type AdminUser = {
   id: string;
   email: string;
   name: string;
   role: Role;
   whatsapp?: string | null;
+  mustChangePassword?: boolean;
 };
 
 const STORAGE_KEY = "asari_user_cache";
 
-// Convert WA number to a synthetic email so it can be used with Supabase email/password.
 export function waToEmail(wa: string): string {
   const digits = wa.replace(/\D/g, "");
   return `wa${digits}@asari.local`;
 }
 
 async function loadUserContext(userId: string, email: string): Promise<AdminUser | null> {
-  const [{ data: profile }, { data: roles }] = await Promise.all([
-    supabase.from("profiles").select("full_name, whatsapp").eq("id", userId).maybeSingle(),
-    supabase.from("user_roles").select("role").eq("user_id", userId),
-  ]);
-  const roleList = (roles ?? []).map((r) => r.role as Role);
-  const role: Role = roleList.includes("admin")
-    ? "admin"
-    : roleList.includes("staff")
-      ? "staff"
-      : "customer";
-  return {
-    id: userId,
-    email,
-    name: profile?.full_name || email,
-    whatsapp: profile?.whatsapp ?? null,
-    role,
-  };
+  try {
+    const [profileRes, rolesRes] = await Promise.all([
+      (supabase as any).from("profiles").select("full_name, whatsapp, is_active, must_change_password").eq("id", userId).maybeSingle(),
+      (supabase as any).from("user_roles").select("role").eq("user_id", userId),
+    ]);
+
+    const profile = profileRes.data;
+    const roles = rolesRes.data ?? [];
+
+    // Check if account is active
+    if (profile && profile.is_active === false) return null;
+
+    // Map DB roles to app roles
+    // 'admin' and 'owner' both map to owner role
+    const hasOwner = roles.some((r: any) => r.role === "owner" || r.role === "admin");
+    const hasStaff = roles.some((r: any) => r.role === "staff");
+
+    const role: Role = hasOwner ? "owner" : hasStaff ? "staff" : "customer";
+
+    return {
+      id: userId,
+      email,
+      name: profile?.full_name || email,
+      whatsapp: profile?.whatsapp ?? null,
+      role,
+      mustChangePassword: profile?.must_change_password ?? false,
+    };
+  } catch {
+    return null;
+  }
 }
 
 const listeners = new Set<() => void>();
@@ -62,45 +75,46 @@ function readCache(): AdminUser | null {
 }
 
 async function refreshFromSession() {
-  const { data } = await supabase.auth.getSession();
-  const session = data.session;
-  if (!session?.user) {
+  try {
+    const { data } = await supabase.auth.getSession();
+    const session = data.session;
+    if (!session?.user) { persistCache(null); return; }
+    const ctx = await loadUserContext(session.user.id, session.user.email ?? "");
+    persistCache(ctx);
+  } catch {
     persistCache(null);
-    return;
   }
-  const ctx = await loadUserContext(session.user.id, session.user.email ?? "");
-  persistCache(ctx);
 }
 
 if (typeof window !== "undefined") {
   cached = readCache();
   if (!initialised) {
     initialised = true;
-    supabase.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_OUT") {
-        persistCache(null);
-      } else if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED" || event === "USER_UPDATED" || event === "INITIAL_SESSION") {
+    supabase.auth.onAuthStateChange((event: string) => {
+      if (event === "SIGNED_OUT") persistCache(null);
+      else if (["SIGNED_IN", "TOKEN_REFRESHED", "USER_UPDATED", "INITIAL_SESSION"].includes(event))
         void refreshFromSession();
-      }
     });
     void refreshFromSession();
   }
 }
 
-export function getCurrentUser(): AdminUser | null {
-  return cached;
-}
+export function getCurrentUser(): AdminUser | null { return cached; }
 
 export async function signInAdmin(email: string, password: string): Promise<{ user: AdminUser | null; error?: string }> {
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error || !data.user) return { user: null, error: error?.message ?? "Login gagal." };
-  const ctx = await loadUserContext(data.user.id, data.user.email ?? email);
-  if (!ctx || (ctx.role !== "admin" && ctx.role !== "staff")) {
-    await supabase.auth.signOut();
-    return { user: null, error: "Akun ini tidak memiliki akses admin." };
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error || !data.user) return { user: null, error: error?.message ?? "Login gagal." };
+    const ctx = await loadUserContext(data.user.id, data.user.email ?? email);
+    if (!ctx || ctx.role === "customer") {
+      await supabase.auth.signOut();
+      return { user: null, error: "Akun ini tidak memiliki akses admin." };
+    }
+    persistCache(ctx);
+    return { user: ctx };
+  } catch (e: any) {
+    return { user: null, error: e.message ?? "Login gagal." };
   }
-  persistCache(ctx);
-  return { user: ctx };
 }
 
 export async function signInCustomer(whatsapp: string, password: string): Promise<{ user: AdminUser | null; error?: string }> {
@@ -113,24 +127,17 @@ export async function signInCustomer(whatsapp: string, password: string): Promis
 }
 
 export async function signUpCustomer(params: {
-  fullName: string;
-  whatsapp: string;
-  password: string;
+  fullName: string; whatsapp: string; password: string;
 }): Promise<{ user: AdminUser | null; error?: string }> {
   const email = waToEmail(params.whatsapp);
   const { data, error } = await supabase.auth.signUp({
-    email,
-    password: params.password,
+    email, password: params.password,
     options: {
       emailRedirectTo: typeof window !== "undefined" ? window.location.origin : undefined,
-      data: {
-        full_name: params.fullName,
-        whatsapp: params.whatsapp.replace(/\D/g, ""),
-      },
+      data: { full_name: params.fullName, whatsapp: params.whatsapp.replace(/\D/g, "") },
     },
   });
   if (error || !data.user) return { user: null, error: error?.message ?? "Pendaftaran gagal." };
-  // Profile is created by the on_auth_user_created trigger.
   const ctx = await loadUserContext(data.user.id, data.user.email ?? email);
   persistCache(ctx);
   return { user: ctx };
@@ -146,15 +153,20 @@ export function useAuth() {
   useEffect(() => {
     const update = () => setUser(cached);
     listeners.add(update);
-    // initial pull in case cache was stale
     void refreshFromSession();
-    return () => {
-      listeners.delete(update);
-    };
+    return () => { listeners.delete(update); };
   }, []);
   return user;
 }
 
+export function isAdminRole(user: AdminUser | null): boolean {
+  return !!user && (user.role === "owner" || user.role === "staff");
+}
+
+export function isOwner(user: AdminUser | null): boolean {
+  return user?.role === "owner";
+}
+
 export function isStaffOrAdmin(user: AdminUser | null): boolean {
-  return !!user && (user.role === "admin" || user.role === "staff");
+  return isAdminRole(user);
 }
