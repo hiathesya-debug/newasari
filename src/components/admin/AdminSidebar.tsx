@@ -2,20 +2,35 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import {
   LayoutDashboard, Flower2, ClipboardList, Globe, FileText,
+<<<<<<< HEAD
   ChevronsLeft, ChevronsRight, LogOut, Users, Menu, X,
 } from "lucide-react";
 import { signOut, useAuth, isOwner } from "@/lib/auth";
 import logoImg from "@/assets/icon/logo.png";
+=======
+  ChevronsLeft, ChevronsRight, LogOut, Users,
+} from "lucide-react";
+import { signOut, useAuth, isOwner } from "@/lib/auth";
+>>>>>>> d1c0379adb199bda33f20b84dd044026a97230ed
 
 type NavItem = { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean; ownerOnly?: boolean };
 
 const NAV: NavItem[] = [
+<<<<<<< HEAD
   { to: "/admin",          label: "Dashboard",                    icon: LayoutDashboard, exact: true },
   { to: "/admin/products", label: "Management Products",          icon: Flower2 },
   { to: "/admin/orders",   label: "Orders",                       icon: ClipboardList },
   { to: "/admin/website",  label: "Management Website",           icon: Globe },
   { to: "/admin/sop",      label: "Standard Operating Procedure", icon: FileText },
   { to: "/admin/accounts", label: "Account Management",           icon: Users, ownerOnly: true },
+=======
+  { to: "/admin",          label: "Dashboard",                   icon: LayoutDashboard, exact: true },
+  { to: "/admin/products", label: "Management Products",         icon: Flower2 },
+  { to: "/admin/orders",   label: "Orders",                      icon: ClipboardList },
+  { to: "/admin/website",  label: "Management Website",          icon: Globe },
+  { to: "/admin/sop",      label: "Standard Operating Procedure",icon: FileText },
+  { to: "/admin/accounts", label: "Account Management",          icon: Users, ownerOnly: true },
+>>>>>>> d1c0379adb199bda33f20b84dd044026a97230ed
 ];
 
 function SidebarContent({
@@ -26,6 +41,7 @@ function SidebarContent({
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const user = useAuth();
   const owner = isOwner(user);
+<<<<<<< HEAD
   const visibleNav = NAV.filter((n) => !n.ownerOnly || owner);
 
   return (
@@ -37,6 +53,21 @@ function SidebarContent({
             ? <img src={logoImg} alt="Asari" className="h-8 w-8 object-contain" />
             : <img src={logoImg} alt="Asari Bouquet & Flower" className="h-12 w-auto object-contain" />
           }
+=======
+
+  const visibleNav = NAV.filter((n) => !n.ownerOnly || owner);
+
+  return (
+    <aside className={`hidden md:flex flex-col bg-white border-r border-[var(--asari-blush-light)] transition-all duration-200 ${collapsed ? "w-16" : "w-56"}`}>
+      <div className={`flex flex-col items-center py-6 border-b border-[var(--asari-blush-light)] ${collapsed ? "px-2" : "px-4"}`}>
+        <Link to="/admin" className="flex flex-col items-center leading-none">
+          <span className="font-display italic text-3xl text-[var(--asari-gold)]">Asari</span>
+          {!collapsed && (
+            <span className="text-[9px] tracking-[0.3em] uppercase text-[var(--asari-charcoal)] mt-1">
+              bouquet &amp; flower
+            </span>
+          )}
+>>>>>>> d1c0379adb199bda33f20b84dd044026a97230ed
         </Link>
         {isMobile && (
           <button onClick={onClose}
@@ -46,14 +77,22 @@ function SidebarContent({
         )}
       </div>
 
+<<<<<<< HEAD
       {/* Nav */}
       <nav className="flex-1 py-4 space-y-1 overflow-y-auto">
+=======
+      <nav className="flex-1 py-4 space-y-1">
+>>>>>>> d1c0379adb199bda33f20b84dd044026a97230ed
         {visibleNav.map((n) => {
           const active = n.exact ? pathname === n.to : pathname.startsWith(n.to);
           const Icon = n.icon;
           return (
+<<<<<<< HEAD
             <Link key={n.to} to={n.to} onClick={onClose}
               title={collapsed && !isMobile ? n.label : undefined}
+=======
+            <Link key={n.to} to={n.to} title={collapsed ? n.label : undefined}
+>>>>>>> d1c0379adb199bda33f20b84dd044026a97230ed
               className={`flex items-center gap-3 px-4 py-2.5 text-sm border-l-[3px] transition-colors ${
                 active
                   ? "border-[var(--asari-gold)] bg-[var(--asari-champagne)]/30 text-[var(--asari-gold)] font-medium"
@@ -76,10 +115,23 @@ function SidebarContent({
             </div>
           </div>
         )}
+<<<<<<< HEAD
         <button onClick={async () => { await signOut(); onClose?.(); }}
           className="flex items-center gap-3 w-full px-2 py-2 text-sm rounded text-[var(--asari-charcoal)] hover:bg-[var(--asari-peach)]/20">
           <LogOut className="h-4 w-4 shrink-0" />
           {(!collapsed || isMobile) && <span>Sign out</span>}
+=======
+        <button onClick={() => signOut()}
+          className="flex items-center gap-3 w-full px-2 py-2 text-sm rounded text-[var(--asari-charcoal)] hover:bg-[var(--asari-peach)]/20"
+          title="Sign out">
+          <LogOut className="h-4 w-4 shrink-0" />
+          {!collapsed && <span>Sign out</span>}
+        </button>
+        <button onClick={() => setCollapsed((v) => !v)}
+          className="flex items-center gap-3 w-full px-2 py-2 text-sm rounded text-[var(--asari-charcoal)] hover:bg-[var(--asari-peach)]/20">
+          {collapsed ? <ChevronsRight className="h-4 w-4" /> : <ChevronsLeft className="h-4 w-4" />}
+          {!collapsed && <span>Collapse</span>}
+>>>>>>> d1c0379adb199bda33f20b84dd044026a97230ed
         </button>
         {!isMobile && (
           <button onClick={() => setCollapsed(!collapsed)}
@@ -91,6 +143,7 @@ function SidebarContent({
       </div>
     </div>
   );
+<<<<<<< HEAD
 }
 
 export function AdminSidebar() {
@@ -128,4 +181,6 @@ export function AdminSidebar() {
       </aside>
     </>
   );
+=======
+>>>>>>> d1c0379adb199bda33f20b84dd044026a97230ed
 }
