@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth, signOut } from "@/lib/auth";
 import { CustomerLayout } from "@/components/CustomerLayout";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { LogOut, Package, User, Home } from "lucide-react";
+import { LogOut, Package, User, Star } from "lucide-react";
 
 export const Route = createFileRoute("/account")({
   beforeLoad: async () => {
@@ -38,10 +38,7 @@ function AccountLayout() {
             Hi, <span className="italic text-[var(--asari-gold)]">{user?.name ?? "Pelanggan"}</span>! 👋
           </h1>
           <button
-            onClick={async () => {
-              await signOut();
-              navigate({ to: "/" });
-            }}
+            onClick={async () => { await signOut(); navigate({ to: "/" }); }}
             className="text-xs uppercase tracking-widest inline-flex items-center gap-2 text-[var(--asari-charcoal)] hover:text-[var(--asari-gold)]"
           >
             <LogOut className="h-4 w-4" /> Sign Out
@@ -50,9 +47,9 @@ function AccountLayout() {
         <div className="h-px bg-[var(--asari-gold)] mb-6" />
 
         <nav className="flex gap-2 mb-8 flex-wrap">
-          <NavPill to="/account" exact icon={<Home className="h-4 w-4" />} pathname={pathname}>Overview</NavPill>
+          <NavPill to="/account" exact icon={<User className="h-4 w-4" />} pathname={pathname}>My Profile</NavPill>
           <NavPill to="/account/orders" icon={<Package className="h-4 w-4" />} pathname={pathname}>My Orders</NavPill>
-          <NavPill to="/account" exact icon={<User className="h-4 w-4" />} pathname={pathname}>Settings</NavPill>
+          <NavPill to="/account/my-reviews" icon={<Star className="h-4 w-4" />} pathname={pathname}>My Reviews</NavPill>
         </nav>
 
         <Outlet />

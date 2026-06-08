@@ -10,7 +10,7 @@ const NAV = [
   { label: "Reviews", to: "/reviews" },
   { label: "Terms and Condition", to: "/terms" },
   { label: "About Us", to: "/about" },
-] as const;
+] satisfies { label: string; to: string }[];
 
 export function CustomerHeader() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -52,8 +52,7 @@ export function CustomerHeader() {
               </button>
               {open && (
                 <div className="absolute right-0 mt-2 w-44 bg-white border border-[var(--asari-blush-light)] rounded shadow-sm py-1 z-20">
-                  <Link to="/account" className="block px-3 py-2 text-sm hover:bg-[var(--asari-peach)]/20">Overview</Link>
-                  <Link to="/account/orders" className="block px-3 py-2 text-sm hover:bg-[var(--asari-peach)]/20">My Orders</Link>
+                  <Link to="/account" className="block px-3 py-2 text-sm hover:bg-[var(--asari-peach)]/20">My Account</Link>
                   <button
                     onClick={async () => { await signOut(); setOpen(false); }}
                     className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 inline-flex items-center gap-2"
@@ -76,7 +75,7 @@ export function CustomerHeader() {
           return (
             <Link
               key={n.to}
-              to={n.to}
+              to={n.to as any}
               className={`font-display uppercase tracking-widest transition-colors ${
                 active
                   ? "text-[var(--asari-gold)] border-b-2 border-[var(--asari-gold)] pb-1"

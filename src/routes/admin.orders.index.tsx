@@ -1,17 +1,19 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
-import { ORDERS, OrderStatus } from "@/lib/mockData";
+import { useState, useEffect } from "react";
 import { formatRp } from "@/lib/format";
-import { Plus, MessageCircle } from "lucide-react";
+import { Plus, MessageCircle, Loader2 } from "lucide-react";
+import { listOrders, DbOrder, DbOrderStatus } from "@/lib/ordersDb";
 
 export const Route = createFileRoute("/admin/orders/")({
   head: () => ({ meta: [{ title: "Orders — Asari Admin" }] }),
   component: OrdersPage,
 });
 
-const STATUSES: (OrderStatus | "Semua")[] = ["Semua", "Pending", "Dikonfirmasi", "Diproses", "Siap", "Selesai", "Dibatalkan"];
+const STATUSES: (DbOrderStatus | "Semua")[] = [
+  "Semua", "Pending", "Dikonfirmasi", "Diproses", "Siap", "Selesai", "Dibatalkan",
+];
 
-const STATUS_COLORS: Record<OrderStatus, string> = {
+const STATUS_COLORS: Record<DbOrderStatus, string> = {
   Pending: "bg-[var(--asari-gold)] text-white",
   Dikonfirmasi: "bg-blue-500 text-white",
   Diproses: "bg-orange-500 text-white",
@@ -21,8 +23,20 @@ const STATUS_COLORS: Record<OrderStatus, string> = {
 };
 
 function OrdersPage() {
-  const [filter, setFilter] = useState<OrderStatus | "Semua">("Semua");
-  const list = filter === "Semua" ? ORDERS : ORDERS.filter((o) => o.status === filter);
+  const [filter, setFilter] = useState<DbOrderStatus | "Semua">("Semua");
+  const [orders, setOrders] = useState<DbOrder[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // FIX: load dari Supabase, bukan mockData
+  useEffect(() => {
+    setLoading(true);
+    listOrders().then((data) => {
+      setOrders(data);
+      setLoading(false);
+    });
+  }, []);
+
+  const list = filter === "Semua" ? orders : orders.filter((o) => o.status === filter);
 
   return (
     <div className="space-y-6">
@@ -53,49 +67,73 @@ function OrdersPage() {
         ))}
       </div>
 
-      <div className="bg-white rounded-lg border border-[var(--asari-blush-light)] overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead className="bg-[var(--asari-champagne)]/40 text-left">
-            <tr>
-              <Th>No. Pesanan</Th><Th>Nama</Th><Th>WA</Th><Th>Produk</Th><Th>Total</Th>
-              <Th>Sumber</Th><Th>Pickup</Th><Th>Metode</Th><Th>Status</Th><Th>Aksi</Th>
-            </tr>
-          </thead>
-          <tbody>
-            {list.map((o) => (
-              <tr key={o.id} className="border-t border-[var(--asari-blush-light)] hover:bg-[var(--asari-peach)]/10">
-                <td className="p-3 font-medium">{o.id}</td>
-                <td className="p-3">{o.customerName}</td>
-                <td className="p-3">
-                  <a href={`https://wa.me/${o.whatsapp.replace(/\D/g, "")}`} target="_blank" rel="noreferrer" className="text-[var(--asari-gold)] hover:underline">
-                    {o.whatsapp}
-                  </a>
-                </td>
-                <td className="p-3">{o.productName} <span className="text-[var(--asari-charcoal)]/60">x{o.quantity}</span></td>
-                <td className="p-3 whitespace-nowrap">{formatRp(o.total)}</td>
-                <td className="p-3">
-                  <span className={`text-xs px-2 py-1 rounded ${o.source === "WA" ? "bg-green-100 text-green-700" : "bg-pink-100 text-pink-700"}`}>
-                    {o.source}
-                  </span>
-                </td>
-                <td className="p-3 text-xs">{o.pickupDate}<br/><span className="text-[var(--asari-charcoal)]/60">{o.pickupTime}</span></td>
-                <td className="p-3 text-xs">{o.method}</td>
-                <td className="p-3">
-                  <span className={`text-xs px-2 py-1 rounded ${STATUS_COLORS[o.status]}`}>{o.status}</span>
-                </td>
-                <td className="p-3">
-                  <Link to="/admin/orders/$id" params={{ id: o.id }} className="text-[var(--asari-gold)] text-xs hover:underline inline-flex items-center gap-1">
-                    <MessageCircle className="h-3 w-3" /> Lihat
-                  </Link>
-                </td>
+      {loading ? (
+        <div className="flex items-center justify-center h-48">
+          <Loader2 className="animate-spin text-[var(--asari-gold)] h-6 w-6" />
+        </div>
+      ) : (
+        <div className="bg-white rounded-lg border border-[var(--asari-blush-light)] overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-[var(--asari-champagne)]/40 text-left">
+              <tr>
+                <Th>No. Pesanan</Th><Th>Nama</Th><Th>WA</Th><Th>Produk</Th><Th>Total</Th>
+                <Th>Sumber</Th><Th>Pickup</Th><Th>Metode</Th><Th>Status</Th><Th>Aksi</Th>
               </tr>
-            ))}
-            {list.length === 0 && (
-              <tr><td colSpan={10} className="p-8 text-center text-[var(--asari-charcoal)]/60">Tidak ada pesanan.</td></tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {list.map((o) => (
+                <tr key={o.id} className="border-t border-[var(--asari-blush-light)] hover:bg-[var(--asari-peach)]/10">
+                  <td className="p-3 font-medium">{o.id}</td>
+                  <td className="p-3">{o.customer_name}</td>
+                  <td className="p-3">
+                    <a
+                      href={`https://wa.me/${o.whatsapp.replace(/\D/g, "")}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-[var(--asari-gold)] hover:underline"
+                    >
+                      {o.whatsapp}
+                    </a>
+                  </td>
+                  <td className="p-3">
+                    {o.product_name} <span className="text-[var(--asari-charcoal)]/60">x{o.quantity}</span>
+                  </td>
+                  <td className="p-3 whitespace-nowrap">{formatRp(o.total)}</td>
+                  <td className="p-3">
+                    <span className={`text-xs px-2 py-1 rounded ${o.source === "WA" ? "bg-green-100 text-green-700" : "bg-pink-100 text-pink-700"}`}>
+                      {o.source}
+                    </span>
+                  </td>
+                  <td className="p-3 text-xs">
+                    {o.pickup_date}<br />
+                    <span className="text-[var(--asari-charcoal)]/60">{o.pickup_time}</span>
+                  </td>
+                  <td className="p-3 text-xs">{o.method}</td>
+                  <td className="p-3">
+                    <span className={`text-xs px-2 py-1 rounded ${STATUS_COLORS[o.status]}`}>{o.status}</span>
+                  </td>
+                  <td className="p-3">
+                    <Link
+                      to="/admin/orders/$id"
+                      params={{ id: o.id }}
+                      className="text-[var(--asari-gold)] text-xs hover:underline inline-flex items-center gap-1"
+                    >
+                      <MessageCircle className="h-3 w-3" /> Lihat
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+              {list.length === 0 && (
+                <tr>
+                  <td colSpan={10} className="p-8 text-center text-[var(--asari-charcoal)]/60">
+                    Tidak ada pesanan.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }

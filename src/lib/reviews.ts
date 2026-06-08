@@ -65,9 +65,6 @@ export async function submitReview(input: {
   if (text.length > 500) return { ok: false, error: "Review maksimal 500 karakter." };
   if (containsProfanity(text)) return { ok: false, error: "Mohon gunakan bahasa yang sopan." };
 
-  const rl = checkClientRateLimit();
-  if (!rl.ok) return { ok: false, error: "Anda sudah mengirim 3 review dalam 24 jam. Silakan coba lagi besok." };
-
   const { data: userResp } = await supabase.auth.getUser();
   const customerId = userResp.user?.id ?? null;
 
@@ -81,7 +78,6 @@ export async function submitReview(input: {
     customer_id: customerId,
   });
   if (error) return { ok: false, error: error.message };
-  recordSubmission();
   return { ok: true };
 }
 

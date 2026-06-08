@@ -205,12 +205,9 @@ function KpiCard({ label, value, note }: { label: string; value: string | number
 /* ─── Dashboard ── */
 function Dashboard() {
   const today = new Date();
-<<<<<<< HEAD
   const user = useAuth();
   const owner = isOwner(user);
 
-=======
->>>>>>> d1c0379adb199bda33f20b84dd044026a97230ed
   const [year, setYear] = useState(today.getFullYear());
   const [month, setMonth] = useState(today.getMonth() + 1);
   const [reviewMonth, setReviewMonth] = useState(today.getMonth() + 1);

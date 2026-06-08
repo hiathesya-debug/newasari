@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { CustomerLayout } from "@/components/CustomerLayout";
 import { ProductCard } from "@/components/ProductCard";
-import { SectionTitle, ViewAllButton, Divider } from "@/components/SectionBits";
+import { SectionTitle, Divider } from "@/components/SectionBits";
 import { CATEGORIES, CATEGORY_SLUGS, PRODUCTS } from "@/lib/mockData";
 import heroImg from "@/assets/hero-floral.jpg";
+import customProductImage from "@/assets/products/custom product.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -19,6 +20,9 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
+  const WA_CUSTOM = "https://wa.me/6287863912739?text=" +
+    encodeURIComponent("Halo Asari! Saya ingin membuat custom order. Boleh minta info lebih lanjut?");
+
   return (
     <CustomerLayout>
       {/* Hero */}
@@ -42,22 +46,82 @@ function Home() {
         </div>
       </section>
 
-      {/* Product sections */}
+      {/* Product sections — 4 flower categories */}
       <div className="max-w-7xl mx-auto px-6 py-16">
         {CATEGORIES.map((cat, idx) => {
           const items = PRODUCTS.filter((p) => p.category === cat).slice(0, 4);
           const slug = CATEGORY_SLUGS[cat];
           return (
             <div key={cat}>
-              <SectionTitle>{cat === "Freshest Series" ? "Our Freshest Series" : cat}</SectionTitle>
+              <SectionTitle>
+                {cat === "Freshest Series" ? "Our Freshest Series" : cat}
+              </SectionTitle>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
-                {items.map((p) => <ProductCard key={p.id} product={p} />)}
+                {items.map((p) => (
+                  <ProductCard key={p.id} product={p} />
+                ))}
               </div>
-              <ViewAllButton to={`/products/${slug}`} />
+              {/* Use query param URL — path-based routes are not nested correctly */}
+              <div className="flex justify-center mt-10">
+                <a
+                  href={"/products?category=" + slug}
+                  className="border border-[var(--asari-gold)] text-[var(--asari-gold)] text-xs uppercase tracking-[0.25em] px-6 py-3 hover:bg-[var(--asari-gold)] hover:text-white transition-colors"
+                >
+                  View All Products
+                </a>
+              </div>
               {idx < CATEGORIES.length - 1 && <Divider />}
             </div>
           );
         })}
+
+        {/* Custom Order banner */}
+        <Divider />
+        <div className="relative overflow-hidden rounded-sm" style={{ minHeight: "320px" }}>
+          {/* Background image */}
+          <img
+            src={customProductImage}
+            alt="Custom Order"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+          {/* Warm overlay */}
+          <div
+            className="absolute inset-0"
+            style={{ background: "rgba(38,22,14,0.58)" }}
+          />
+          {/* Content */}
+          <div className="relative flex flex-col items-center justify-center text-center px-6 py-20 h-full gap-4">
+            <p
+              className="font-body text-xs uppercase tracking-[0.3em] mb-2"
+              style={{ color: "#D9A84E" }}
+            >
+              Bespoke & Personalised
+            </p>
+            <h2 className="font-display text-5xl md:text-6xl text-white leading-tight">
+              Custom Order
+            </h2>
+            <p className="font-body text-white/80 text-sm max-w-md mt-2 leading-relaxed">
+              Bring your idea to life — we&apos;ll wrap it.
+            </p>
+            <div className="flex flex-wrap justify-center gap-3 mt-4">
+              <a
+                href={WA_CUSTOM}
+                target="_blank"
+                rel="noreferrer"
+                className="font-body font-semibold text-xs uppercase tracking-widest px-6 py-3 text-white transition-colors"
+                style={{ backgroundColor: "#D9A84E" }}
+              >
+                Ask the Owner
+              </a>
+              <a
+                href="/products?category=custom-order"
+                className="font-body font-semibold text-xs uppercase tracking-widest px-6 py-3 text-white border border-white/60 hover:bg-white/10 transition-colors"
+              >
+                See Custom Products
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* About */}
