@@ -2,6 +2,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { Search, User, LogOut } from "lucide-react";
 import { useAuth, signOut } from "@/lib/auth";
 import { useState, useRef, useEffect } from "react";
+import logoImg from "@/assets/icon/logo.png";
 
 const NAV = [
   { label: "Home", to: "/" },
@@ -30,19 +31,18 @@ export function CustomerHeader() {
   return (
     <header className="w-full bg-[var(--asari-off-white)] border-b border-[var(--asari-blush-light)]">
       <div className="relative flex items-center justify-center px-6 py-6">
-        <Link to="/" className="flex flex-col items-center leading-none">
-          <span className="font-display italic text-4xl text-[var(--asari-gold)] tracking-tight">
-            Asari
-          </span>
-          <span className="text-[10px] tracking-[0.3em] uppercase text-[var(--asari-charcoal)] mt-1">
-            bouquet &amp; flower
-          </span>
+        <Link to="/">
+          <img
+            src={logoImg}
+            alt="Asari Bouquet & Flower"
+            className="h-16 w-auto object-contain"
+          />
         </Link>
         <div className="absolute right-6 flex items-center gap-4">
           <button aria-label="Search" className="text-[var(--asari-charcoal)] hover:text-[var(--asari-gold)]">
             <Search className="h-5 w-5" />
           </button>
-          {user && (user.role === "customer") ? (
+          {user && user.role === "customer" ? (
             <div className="relative" ref={ref}>
               <button
                 onClick={() => setOpen((v) => !v)}
@@ -77,7 +77,7 @@ export function CustomerHeader() {
             <Link
               key={n.to}
               to={n.to}
-              className={`uppercase tracking-widest transition-colors ${
+              className={`font-display uppercase tracking-widest transition-colors ${
                 active
                   ? "text-[var(--asari-gold)] border-b-2 border-[var(--asari-gold)] pb-1"
                   : "text-[var(--asari-charcoal)] hover:text-[var(--asari-gold)]"

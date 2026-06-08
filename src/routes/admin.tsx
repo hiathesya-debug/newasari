@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet, useRouterState, redirect } from "@tanstack/react-router";
+import { createFileRoute, Outlet, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,7 +8,6 @@ export const Route = createFileRoute("/admin")({
   beforeLoad: ({ location }) => {
     if (typeof window === "undefined") return;
     if (location.pathname === "/admin/login") return;
-    // Defer actual session check to the component for snappy SPA UX.
   },
   component: AdminLayout,
 });
@@ -27,11 +26,16 @@ function AdminLayout() {
         if (!cancelled) navigate({ to: "/admin/login" });
         return;
       }
-      const { data: roles } = await supabase
+      const { data: roles } = await (supabase as any)
         .from("user_roles")
         .select("role")
         .eq("user_id", session.session.user.id);
-      const ok = (roles ?? []).some((r) => r.role === "admin" || r.role === "staff");
+
+      // Accept: owner, admin (legacy), staff
+      const ok = (roles ?? []).some((r: any) =>
+        r.role === "owner" || r.role === "admin" || r.role === "staff"
+      );
+
       if (!ok) {
         if (!cancelled) navigate({ to: "/admin/login" });
         return;

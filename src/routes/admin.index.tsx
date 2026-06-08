@@ -19,9 +19,9 @@ const MONTH_NAMES = [
 
 function Dashboard() {
   const today = new Date();
-  const [year, setYear] = useState(2026);
-  const [month, setMonth] = useState(5); // May
-  const [reviewMonth, setReviewMonth] = useState(5);
+  const [year, setYear] = useState(today.getFullYear());
+  const [month, setMonth] = useState(today.getMonth() + 1);
+  const [reviewMonth, setReviewMonth] = useState(today.getMonth() + 1);
   const [showPicker, setShowPicker] = useState(false);
 
   const salesData = useMemo(() => generateSalesData(year, month), [year, month]);
