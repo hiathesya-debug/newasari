@@ -57,6 +57,13 @@ export async function submitReview(input: {
   productName?: string | null;
   reviewText: string;
 }): Promise<{ ok: true } | { ok: false; error: string }> {
+  // 1. Enforce the Client-Side Rate Limit (Max 3 per day)
+  const rl = checkClientRateLimit();
+  if (!rl.ok) {
+    return { ok: false, error: `Anda telah mencapai batas pengisian review harian (Maks ${rl.remaining + MAX_PER_DAY}/hari).` };
+  }
+
+  // 2. Validate Input
   if (!input.isAnonymous && !input.name.trim()) {
     return { ok: false, error: "Nama wajib diisi atau centang anonim." };
   }
@@ -68,16 +75,21 @@ export async function submitReview(input: {
   const { data: userResp } = await supabase.auth.getUser();
   const customerId = userResp.user?.id ?? null;
 
+  // 3. Insert into Database
   const { error } = await supabase.from("reviews").insert({
     name: input.isAnonymous ? null : input.name.trim(),
     is_anonymous: input.isAnonymous,
     product_id: input.productId ?? null,
     product_name: input.productName ?? null,
     review_text: text,
-    status: "pending",
-    customer_id: customerId,
+    status: "pending", // Always goes to Admin Dashboard first!
+    customer_id: customerId, // Will be null for guests, which is fine
   });
+
   if (error) return { ok: false, error: error.message };
+
+  // 4. Record the successful submission to local storage
+  recordSubmission();
   return { ok: true };
 }
 

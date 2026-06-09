@@ -1,136 +1,159 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { CustomerLayout } from "@/components/CustomerLayout";
+import sizeGuideImg from "@/assets/bouquet size guide.png"; // Mengimpor gambar size guide
 
 export const Route = createFileRoute("/terms")({
   head: () => ({
-    meta: [
-      { title: "Terms & Conditions — Asari Bouquet & Flower" },
-      { name: "description", content: "Syarat dan ketentuan pemesanan di Asari Bouquet & Flower." },
-    ],
+    meta: [{ title: "Terms & Conditions — Asari Bouquet & Flower" }],
   }),
-  component: Terms,
+  component: TermsPage,
 });
 
-function Terms() {
+function TermsPage() {
+  const termsData = [
+    {
+      title: "Order Rules",
+      items: [
+        {
+          id: "Pemesanan disarankan dilakukan H-3 hingga H-7 sebelum hari pengiriman.",
+          en: "We highly recommend placing your orders 3 to 7 days prior to the delivery date."
+        },
+        {
+          id: "Pemesanan dadakan (H-1 / hari H) dapat dilayani apabila slot dan bunga masih tersedia.",
+          en: "Last-minute orders (1 day before or on the day) can be accommodated if delivery slots and flowers are still available."
+        },
+        {
+          id: "Setiap rangkaian bunga bersifat unik dan buatan tangan. Hasil akhir mungkin memiliki sedikit perbedaan dengan foto referensi tergantung ketersediaan dan bentuk alami bunga.",
+          en: "Each floral arrangement is unique and handcrafted. The final result may have slight differences from the reference photo depending on the availability and natural shape of the flowers."
+        },
+        {
+          id: "Custom order dapat didiskusikan terlebih dahulu dengan admin mengenai ketersediaan bunga dan budget.",
+          en: "Custom orders can be discussed in advance with our admin regarding flower availability and your budget."
+        }
+      ]
+    },
+    {
+      title: "Payment",
+      items: [
+        {
+          id: "Pesanan baru akan diproses dan slot diamankan (secured) setelah Full Payment diterima.",
+          en: "Orders will only be processed and delivery slots secured after Full Payment is received."
+        },
+        {
+          id: "Pembayaran dapat dilakukan melalui Transfer Bank (BCA) atau QRIS.",
+          en: "Payments can be made via Bank Transfer (BCA) or QRIS."
+        },
+        {
+          id: "Mohon mengirimkan bukti transfer setelah melakukan pembayaran agar pesanan dapat segera dikonfirmasi.",
+          en: "Please send the transfer receipt after making your payment so the order can be confirmed immediately."
+        },
+        {
+          id: "Harga yang tertera belum termasuk ongkos kirim (untuk opsi pengiriman).",
+          en: "The listed prices do not include delivery fees (for the delivery option)."
+        }
+      ]
+    },
+    {
+      title: "Delivery & Pick Up",
+      items: [
+        {
+          id: "Pengiriman dilakukan menggunakan kurir instan (Gojek/Grab) dari Antapani, Bandung.",
+          en: "Delivery is carried out using instant couriers (Gojek/Grab) from Antapani, Bandung."
+        },
+        {
+          id: "Kerusakan yang terjadi selama proses pengiriman oleh pihak ketiga (kurir) di luar tanggung jawab Asari Bouquet & Flower. Namun, kami akan memastikan packaging seaman mungkin.",
+          en: "Any damage that occurs during the delivery process by third parties (couriers) is beyond the responsibility of Asari Bouquet & Flower. However, we will ensure the packaging is as secure as possible."
+        },
+        {
+          id: "Self pick-up dapat dilakukan dengan mengkonfirmasi jam pengambilan kepada admin terlebih dahulu.",
+          en: "Self pick-up can be arranged by confirming the pick-up time with our admin in advance."
+        },
+        {
+          id: "Mohon pastikan alamat lengkap dan nomor penerima aktif saat pengiriman.",
+          en: "Please ensure you provide the complete address and an active receiver's phone number for delivery."
+        }
+      ]
+    },
+    {
+      title: "Refund & Cancellation",
+      items: [
+        {
+          id: "Pesanan yang sudah dibayar (confirmed) tidak dapat dibatalkan atau di-refund.",
+          en: "Orders that have been paid (confirmed) cannot be canceled or refunded."
+        },
+        {
+          id: "Perubahan tanggal pengiriman atau detail pesanan maksimal dilakukan H-2 (tergantung ketersediaan slot).",
+          en: "Changes to the delivery date or order details can be made up to 2 days before the delivery date (subject to slot availability)."
+        },
+        {
+          id: "Jika terjadi kelangkaan bunga mendadak dari supplier, kami akan menginformasikan kepada customer untuk opsi penggantian bunga senilai dengan persetujuan customer.",
+          en: "In the event of a sudden flower shortage from our supplier, we will inform the customer to offer replacement options of equal value, subject to the customer's approval."
+        }
+      ]
+    }
+  ];
+
   return (
     <CustomerLayout>
-      <div className="max-w-3xl mx-auto px-6 py-20">
-        <h1 className="font-display text-5xl text-center mb-10">Terms &amp; Conditions</h1>
-        <div className="space-y-10 text-sm text-[var(--asari-charcoal)] leading-relaxed">
-
-          <Group title="Order Rules">
-            <Section title="Order Placement">
-              Please place your orders at least two days in advance (D-2) or as specified in our Open Order announcements.
-            </Section>
-            <Section title="Availability">
-              Last-minute orders are only accepted for ready-stock flowers.
-            </Section>
-            <Section title="Custom Orders">
-              We highly recommend placing custom orders well in advance.
-            </Section>
-            <Section title="Purchasing Channels">
-              Orders are exclusively processed via Instagram Direct Message (DM) or WhatsApp.
-            </Section>
-            <Section title="Location & Operations">
-              We are based in Antapani, Bandung City. Please note that we operate exclusively online and <strong>do not have a physical storefront</strong>.
-            </Section>
-            <Section title="Customer Service">
-              Please expect delayed responses to messages sent outside of business hours or on holidays.
-            </Section>
-            <Section title="Updates">
-              Please refer to our Instagram Story for the latest information and updates.
-            </Section>
-          </Group>
-
-          <Group title="Payment">
-            <Section title="Order Processing">
-              Orders will only be added to our queue upon receipt of full payment or a down payment (DP).
-            </Section>
-            <Section title="Payment Method">
-              We strictly accept payments via bank transfer.
-            </Section>
-            <Section title="Proof of Payment">
-              Customers are required to send proof of payment via chat to verify their transaction.
-            </Section>
-            <Section title="Down Payments (DP)">
-              A minimum 50% DP applies to purchases of IDR 100,000 and above. For orders below IDR 100,000, the DP amount will be adjusted accordingly.
-            </Section>
-          </Group>
-
-          <Group title="Pickup & Delivery Rules">
-            <Section title="Schedule Changes">
-              If you need to change your pickup day or time, please notify our admin immediately via chat.
-            </Section>
-            <Section title="Early Pickup">
-              Bouquets cannot be collected earlier than the scheduled time specified in your order format without prior confirmation from our admin.
-            </Section>
-            <Section title="Collection Methods">
-              You may opt for self-pickup or arrange your own courier service.
-            </Section>
-            <Section title="Store Delivery Arrangement">
-              If you are ordering from outside Bandung, we can help arrange a delivery driver for you. Please ensure the recipient's contact number remains active throughout the delivery process.
-            </Section>
-            <Section title="Service Area Coverage">
-              We exclusively serve Bandung and its surrounding areas. Due to the delicate nature of fresh flowers, out-of-town shipping is not available.
-            </Section>
-          </Group>
-
-          <Group title="Disclaimer">
-            <Section title="Order Forms">
-              Customers are requested to fill out the order form clearly and completely. If there are any revisions, please notify us immediately.
-            </Section>
-            <Section title="Liability">
-              We are not responsible for any errors resulting from unclear or incomplete order details provided by the customer.
-            </Section>
-            <Section title="Order Confirmation">
-              Submitting the order form confirms that your order is final, and prompt payment is required.
-            </Section>
-            <Section title="Handcrafted Nature">
-              Because our arrangements are handcrafted and the natural proportions of flowers vary, no two arrangements will ever be exactly identical.
-            </Section>
-            <Section title="Reference Photos">
-              We will do our absolute best to match catalog or reference photos, but exact replication is not possible. We also accept custom requests and external reference photos, but we cannot replicate them 100% as we do not plagiarize other florists' work.
-            </Section>
-            <Section title="Substitutions">
-              Flower availability is subject to change, so placing orders several days in advance is highly recommended. If a specific flower in your arrangement is unavailable, we will notify you and substitute it with a similar flower of equal value.
-            </Section>
-            <Section title="Lifespan">
-              Our flowers typically stay fresh for ± 3-4 days. For example, picking up your bouquet the day before your event (D-1) is perfectly safe.
-            </Section>
-            <Section title="Care Instructions">
-              While we cannot guarantee the exact lifespan of the flowers, keeping them in a cool place and away from direct sunlight or heat will significantly prolong their freshness.
-            </Section>
-            <Section title="Refund Policy">
-              All sales are final. Purchased items cannot be returned or refunded.
-            </Section>
-            <Section title="Revision Surcharge">
-              Any design revisions requested after the arrangement is completed may incur a 25% surcharge of the product price (unless the error was made by our team).
-            </Section>
-            <Section title="Safe Transport">
-              For safety reasons, customers picking up more than one Large (Size L) bouquet are strictly required to use a car.
-            </Section>
-          </Group>
-
+      <div className="max-w-4xl mx-auto px-6 py-20 min-h-[70vh]">
+        
+        {/* Header Title */}
+        <div className="text-center mb-10">
+          <h1 className="font-display text-4xl md:text-5xl text-[var(--asari-charcoal)] mb-4">
+            Terms &amp; Conditions
+          </h1>
+          <p className="text-xs md:text-sm uppercase tracking-[0.2em] text-[var(--asari-charcoal)]/60">
+            Harap dibaca dengan saksama sebelum memesan
+          </p>
         </div>
+
+        {/* Size Guide Image Container */}
+        <div className="w-full rounded-xl overflow-hidden mb-12 shadow-sm border border-[var(--asari-blush-light)] bg-white">
+          <img 
+            src={sizeGuideImg} 
+            alt="Bouquet Size Guide" 
+            className="w-full h-auto object-contain"
+          />
+        </div>
+
+        {/* Terms Vertical Stack */}
+        <div className="flex flex-col gap-8">
+          {termsData.map((section, idx) => (
+            <div 
+              key={idx}
+              className="bg-white rounded-xl border border-[var(--asari-blush-light)] p-8 md:p-10 shadow-sm"
+            >
+              {/* Card Title */}
+              <h2 className="font-display text-3xl text-[var(--asari-gold)] mb-6 pb-4 border-b border-[var(--asari-blush-light)]">
+                {section.title}
+              </h2>
+              
+              {/* List of Rules */}
+              <ul className="space-y-6">
+                {section.items.map((item, itemIdx) => (
+                  <li 
+                    key={itemIdx} 
+                    className="flex items-start gap-3"
+                  >
+                    <span className="text-[var(--asari-gold)] mt-1.5">•</span>
+                    <div className="flex flex-col">
+                      {/* Indonesian - Main text */}
+                      <span className="text-[17px] font-medium text-[var(--asari-charcoal)]/80 leading-relaxed">
+                        {item.id}
+                      </span>
+                      {/* English - Secondary text (Italicized and slightly muted) */}
+                      <span className="text-[15px] italic text-[var(--asari-charcoal)]/50 leading-relaxed mt-1">
+                        {item.en}
+                      </span>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
       </div>
     </CustomerLayout>
-  );
-}
-
-function Group({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div className="space-y-4">
-      <h2 className="font-display text-2xl text-[var(--asari-charcoal)] border-b border-[var(--asari-blush-light)] pb-2">{title}</h2>
-      {children}
-    </div>
-  );
-}
-
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <h3 className="font-display text-base text-[var(--asari-gold)] mb-1">{title}</h3>
-      <p>{children}</p>
-    </div>
   );
 }

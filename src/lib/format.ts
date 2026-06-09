@@ -22,6 +22,10 @@ export function formatMonthYear(d: Date): string {
 
 export function timeAgo(d: Date): string {
   const diff = Date.now() - d.getTime();
+  
+  // FIX: Catch future times caused by server/client clock mismatches
+  if (diff < 0) return "just now"; 
+
   const mins = Math.floor(diff / 60000);
   if (mins < 60) return `${mins} mins ago`;
   const hrs = Math.floor(mins / 60);

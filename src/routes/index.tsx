@@ -5,6 +5,9 @@ import { SectionTitle, Divider } from "@/components/SectionBits";
 import { CATEGORIES, CATEGORY_SLUGS, PRODUCTS } from "@/lib/mockData";
 import heroImg from "@/assets/hero-floral.jpg";
 import customProductImage from "@/assets/products/custom product.png";
+import { useEffect, useState } from "react";
+import { listApprovedReviews, type ReviewRow } from "@/lib/reviews";
+import { timeAgo } from "@/lib/format";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -20,6 +23,13 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
+  const [reviews, setReviews] = useState<ReviewRow[]>([]);
+
+  useEffect(() => {
+    // Fetch approved reviews when the homepage loads
+    listApprovedReviews().then(setReviews);
+  }, []);
+
   const WA_CUSTOM = "https://wa.me/6287863912739?text=" +
     encodeURIComponent("Halo Asari! Saya ingin membuat custom order. Boleh minta info lebih lanjut?");
 
@@ -61,7 +71,6 @@ function Home() {
                   <ProductCard key={p.id} product={p} />
                 ))}
               </div>
-              {/* Use query param URL — path-based routes are not nested correctly */}
               <div className="flex justify-center mt-10">
                 <a
                   href={"/products?category=" + slug}
@@ -95,33 +104,86 @@ function Home() {
               className="font-body text-xs uppercase tracking-[0.3em] mb-2"
               style={{ color: "#D9A84E" }}
             >
-              Bespoke & Personalised
+              Dibuat Khusus &amp; Personal
             </p>
             <h2 className="font-display text-5xl md:text-6xl text-white leading-tight">
               Custom Order
             </h2>
-            <p className="font-body text-white/80 text-sm max-w-md mt-2 leading-relaxed">
-              Bring your idea to life — we&apos;ll wrap it.
-            </p>
-            <div className="flex flex-wrap justify-center gap-3 mt-4">
+            
+            {/* Bilingual Paragraph text */}
+            <div className="flex flex-col items-center gap-1 mt-2">
+              <p className="font-body text-white/95 text-[15px] max-w-md leading-relaxed">
+                Wujudkan ide Anda — kami yang akan merangkainya.
+              </p>
+              <p className="font-body text-white/60 text-[13px] italic max-w-md leading-relaxed">
+                Bring your idea to life — we&apos;ll wrap it.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap justify-center gap-3 mt-5">
               <a
                 href={WA_CUSTOM}
                 target="_blank"
                 rel="noreferrer"
-                className="font-body font-semibold text-xs uppercase tracking-widest px-6 py-3 text-white transition-colors"
+                className="font-body font-semibold text-xs uppercase tracking-widest px-6 py-3 text-white transition-colors hover:opacity-90"
                 style={{ backgroundColor: "#D9A84E" }}
               >
-                Ask the Owner
+                Tanya Owner
               </a>
               <a
                 href="/products?category=custom-order"
                 className="font-body font-semibold text-xs uppercase tracking-widest px-6 py-3 text-white border border-white/60 hover:bg-white/10 transition-colors"
               >
-                See Custom Products
+                Lihat Produk Custom
               </a>
             </div>
           </div>
         </div>
+
+        {/* Reviews Section */}
+        {reviews.length > 0 && (
+          <>
+            <Divider />
+            <div className="py-10">
+              <SectionTitle>What They Say</SectionTitle>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {reviews.slice(0, 4).map((r) => (
+                  <div
+                    key={r.id}
+                    className="bg-white rounded-lg border border-[var(--asari-blush-light)] p-5 flex flex-col h-full"
+                  >
+                    <div className="flex-1 min-w-0 mb-3">
+                      <div className="flex flex-wrap items-center gap-2 mb-2">
+                        <span className="font-medium text-sm text-[var(--asari-charcoal)]">
+                          {r.is_anonymous ? "Anonim" : r.name ?? "—"}
+                        </span>
+                        {r.product_name && (
+                          <span className="text-[10px] uppercase tracking-widest bg-[var(--asari-peach)]/30 text-[var(--asari-charcoal)] px-2 py-0.5 rounded-full truncate max-w-[120px]">
+                            {r.product_name}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[13px] text-[var(--asari-charcoal)]/80 leading-relaxed line-clamp-4">
+                        {r.review_text}
+                      </p>
+                    </div>
+                    <p className="text-[11px] text-[var(--asari-charcoal)]/40 mt-auto">
+                      {timeAgo(new Date(r.created_at))}
+                    </p>
+                  </div>
+                ))}
+              </div>
+              <div className="flex justify-center mt-10">
+                <Link
+                  to="/reviews"
+                  className="border border-[var(--asari-gold)] text-[var(--asari-gold)] text-xs uppercase tracking-[0.25em] px-6 py-3 hover:bg-[var(--asari-gold)] hover:text-white transition-colors"
+                >
+                  View All Reviews
+                </Link>
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       {/* About */}
