@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { TrendingDown, TrendingUp, Pencil, Check, X, Loader2, CalendarClock } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer, Tooltip } from "recharts";
-import { REVIEWS } from "@/lib/mockData";
+import { REVIEWS, generateSalesData } from "@/lib/mockData";
 import { formatMonthYear, timeAgo } from "@/lib/format";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, isOwner } from "@/lib/auth";
@@ -19,14 +19,13 @@ const MONTH_NAMES = [
   "July","August","September","October","November","December",
 ];
 
-// Status yang dihitung sebagai revenue
 const REVENUE_STATUSES = ["Dikonfirmasi", "Diproses", "Siap", "Selesai"];
 
 /* ─── Load sales data from real orders ── */
 async function loadSalesData(year: number, month: number) {
   const daysInMonth = new Date(year, month, 0).getDate();
   const start = `${year}-${String(month).padStart(2, "0")}-01T00:00:00`;
-  const end = `${year}-${String(month).padStart(2, "0")}-${daysInMonth}T23:59:59`;
+  const end   = `${year}-${String(month).padStart(2, "0")}-${daysInMonth}T23:59:59`;
 
   const { data } = await (supabase as any)
     .from("orders")
@@ -36,8 +35,6 @@ async function loadSalesData(year: number, month: number) {
     .in("status", REVENUE_STATUSES);
 
   const orders = data ?? [];
-
-  // Aggregate per day
   return Array.from({ length: daysInMonth }, (_, i) => {
     const day = i + 1;
     const dayRevenue = orders
@@ -51,7 +48,7 @@ async function loadSalesData(year: number, month: number) {
 async function loadTotalOrders(year: number, month: number): Promise<number> {
   const daysInMonth = new Date(year, month, 0).getDate();
   const start = `${year}-${String(month).padStart(2, "0")}-01T00:00:00`;
-  const end = `${year}-${String(month).padStart(2, "0")}-${daysInMonth}T23:59:59`;
+  const end   = `${year}-${String(month).padStart(2, "0")}-${daysInMonth}T23:59:59`;
 
   const { count } = await (supabase as any)
     .from("orders")
@@ -82,14 +79,14 @@ function fmtDate(iso: string | null) {
 function FollowersCard({ label, iconSrc, brandBg, settingKey, canEdit }: {
   label: string; iconSrc: string; brandBg: string; settingKey: string; canEdit: boolean;
 }) {
-  const [value, setValue] = useState<number | null>(null);
+  const [value, setValue]         = useState<number | null>(null);
   const [prevValue, setPrevValue] = useState<number | null>(null);
-  const [change, setChange] = useState<number | null>(null);
-  const [changeUp, setChangeUp] = useState(true);
+  const [change, setChange]       = useState<number | null>(null);
+  const [changeUp, setChangeUp]   = useState(true);
   const [updatedAt, setUpdatedAt] = useState<string | null>(null);
-  const [editing, setEditing] = useState(false);
+  const [editing, setEditing]     = useState(false);
   const [countInput, setCountInput] = useState("");
-  const [saving, setSaving] = useState(false);
+  const [saving, setSaving]       = useState(false);
 
   useEffect(() => {
     getSetting(settingKey).then((d) => { if (d) { setValue(Number(d.value)); setUpdatedAt(d.updated_at); } });
@@ -99,10 +96,10 @@ function FollowersCard({ label, iconSrc, brandBg, settingKey, canEdit }: {
     });
   }, [settingKey]);
 
-  const newVal = parseInt(countInput.replace(/\D/g, ""), 10);
+  const newVal  = parseInt(countInput.replace(/\D/g, ""), 10);
   const autoPct = (!isNaN(newVal) && prevValue !== null && prevValue > 0)
     ? Math.round(((newVal - prevValue) / prevValue) * 100) : null;
-  const autoUp = autoPct !== null ? autoPct >= 0 : true;
+  const autoUp  = autoPct !== null ? autoPct >= 0 : true;
 
   const handleSave = async () => {
     if (isNaN(newVal)) return;
@@ -133,7 +130,6 @@ function FollowersCard({ label, iconSrc, brandBg, settingKey, canEdit }: {
           </button>
         )}
       </div>
-
       {editing ? (
         <div className="space-y-3">
           <div>
@@ -205,20 +201,21 @@ function KpiCard({ label, value, note }: { label: string; value: string | number
 /* ─── Dashboard ── */
 function Dashboard() {
   const today = new Date();
-  const user = useAuth();
+  const user  = useAuth();
   const owner = isOwner(user);
 
-  const [year, setYear] = useState(today.getFullYear());
-  const [month, setMonth] = useState(today.getMonth() + 1);
+  const [year,  setYear]       = useState(today.getFullYear());
+  const [month, setMonth]      = useState(today.getMonth() + 1);
   const [reviewMonth, setReviewMonth] = useState(today.getMonth() + 1);
-  const [showPicker, setShowPicker] = useState(false);
+  const [showPicker, setShowPicker]   = useState(false);
 
-  const [salesData, setSalesData] = useState<{ day: number; revenue: number }[]>([]);
-  const [totalOrders, setTotalOrders] = useState<number | null>(null);
+  const [salesData,    setSalesData]    = useState<{ day: number; revenue: number }[]>([]);
+  const [isSampleData, setIsSampleData] = useState(false);
+  const [totalOrders,  setTotalOrders]  = useState<number | null>(null);
   const [loadingSales, setLoadingSales] = useState(true);
 
   const periodLabel = formatMonthYear(new Date(year, month - 1));
-  const reviews = REVIEWS[`${year}-${String(reviewMonth).padStart(2, "0")}`] ?? [];
+  const reviews     = REVIEWS[`${year}-${String(reviewMonth).padStart(2, "0")}`] ?? [];
 
   useEffect(() => {
     setLoadingSales(true);
@@ -226,7 +223,16 @@ function Dashboard() {
       loadSalesData(year, month),
       loadTotalOrders(year, month),
     ]).then(([sales, orders]) => {
-      setSalesData(sales);
+      const hasRealData = sales.some((d) => d.revenue > 0);
+      if (hasRealData) {
+        // Real orders exist — show actual data
+        setSalesData(sales);
+        setIsSampleData(false);
+      } else {
+        // No confirmed orders yet — fall back to sample wave so chart is visible
+        setSalesData(generateSalesData(year, month));
+        setIsSampleData(true);
+      }
       setTotalOrders(orders);
       setLoadingSales(false);
     });
@@ -267,12 +273,18 @@ function Dashboard() {
             <div>
               <h2 className="font-display text-2xl">Sales Statistics</h2>
               <p className="text-[var(--asari-coral)] text-sm">{periodLabel}</p>
+              {/* Sample data badge — shown when no real orders exist yet */}
+              {isSampleData && !loadingSales && (
+                <span className="inline-flex items-center text-[10px] uppercase tracking-wider bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full mt-1">
+                  Contoh data · belum ada pesanan dikonfirmasi
+                </span>
+              )}
             </div>
             {!loadingSales && (
               <div className="text-right">
                 <p className="text-xs text-[var(--asari-charcoal)]/50">Total Revenue</p>
                 <p className="font-body font-bold text-sm text-[var(--asari-gold)]">
-                  Rp {totalRevenue.toLocaleString("id-ID")}
+                  {isSampleData ? "Rp 0" : `Rp ${totalRevenue.toLocaleString("id-ID")}`}
                 </p>
               </div>
             )}
@@ -287,17 +299,19 @@ function Dashboard() {
                 <AreaChart data={salesData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                   <defs>
                     <linearGradient id="goldFill" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#D9A84E" stopOpacity={0.8} />
-                      <stop offset="100%" stopColor="#F2DAAC" stopOpacity={0.1} />
+                      <stop offset="0%"   stopColor="#D9A84E" stopOpacity={isSampleData ? 0.35 : 0.8} />
+                      <stop offset="100%" stopColor="#F2DAAC" stopOpacity={0.05} />
                     </linearGradient>
                   </defs>
                   <XAxis dataKey="day" tick={{ fontSize: 10, fill: "#8C775E" }} axisLine={{ stroke: "#E8DCC8" }} tickLine={false} />
                   <YAxis tickFormatter={(v) => v === 0 ? "0" : `${Math.round(v/1000)}k`}
                     tick={{ fontSize: 10, fill: "#8C775E" }} axisLine={false} tickLine={false} />
                   <Tooltip
-                    formatter={(v: number) => v === 0 ? ["Rp 0", "Revenue"] : [`Rp ${v.toLocaleString("id-ID")}`, "Revenue"]}
+                    formatter={(v: number) => isSampleData ? ["(contoh)", "Revenue"] : [`Rp ${v.toLocaleString("id-ID")}`, "Revenue"]}
                     contentStyle={{ borderRadius: 6, border: "1px solid #F2D1B3", fontSize: 12 }} />
-                  <Area type="monotone" dataKey="revenue" stroke="#D9A84E" strokeWidth={2} fill="url(#goldFill)" />
+                  <Area type="monotone" dataKey="revenue"
+                    stroke={isSampleData ? "#D9A84E88" : "#D9A84E"}
+                    strokeWidth={2} fill="url(#goldFill)" />
                 </AreaChart>
               </ResponsiveContainer>
             )}
@@ -310,7 +324,7 @@ function Dashboard() {
         {/* KPIs */}
         <div className="grid gap-4 content-start">
           <FollowersCard label="Instagram Followers" iconSrc={iconInsta} brandBg="#E1306C" settingKey="instagram_followers" canEdit={!!owner} />
-          <FollowersCard label="TikTok Followers" iconSrc={iconTiktok} brandBg="#010101" settingKey="tiktok_followers" canEdit={!!owner} />
+          <FollowersCard label="TikTok Followers"    iconSrc={iconTiktok} brandBg="#010101" settingKey="tiktok_followers"    canEdit={!!owner} />
           <KpiCard
             label="Total Orders"
             value={totalOrders !== null ? totalOrders : "—"}
@@ -324,7 +338,7 @@ function Dashboard() {
         <h2 className="font-display text-2xl mb-4"><span className="italic">All</span> Review</h2>
         <div className="flex gap-2 overflow-x-auto pb-3 mb-4">
           {MONTH_NAMES.slice(1).map((name, idx) => {
-            const num = idx + 2;
+            const num    = idx + 2;
             const active = num === reviewMonth;
             return (
               <button key={name} onClick={() => setReviewMonth(num)}
@@ -346,11 +360,11 @@ function Dashboard() {
 const AVATAR_COLORS = ["#F2D0A7","#F2CDC4","#F2DAAC","#EDA28F","#F2CA7E"];
 function ReviewCard({ name, when, text }: { name: string; when: string; text: string }) {
   const initial = name.charAt(0).toUpperCase();
-  const color = AVATAR_COLORS[name.length % AVATAR_COLORS.length];
+  const color   = AVATAR_COLORS[name.length % AVATAR_COLORS.length];
   return (
     <div className="border border-[var(--asari-blush-light)] rounded-lg p-4 bg-white">
       <div className="flex items-center gap-3 mb-2">
-        <div className="h-9 w-9 rounded-full flex items-center justify-center text-sm font-medium text-white" style={{ backgroundColor: color }}>{initial}</div>
+        <div className="h-9 w-9 rounded-full flex items-center justify-center text-sm font-medium" style={{ backgroundColor: color, color: "#8C775E" }}>{initial}</div>
         <div className="min-w-0">
           <p className="text-sm font-semibold truncate">{name}</p>
           <p className="text-[11px] text-[var(--asari-charcoal)]/60">{when}</p>
