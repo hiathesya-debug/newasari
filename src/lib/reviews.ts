@@ -57,13 +57,6 @@ export async function submitReview(input: {
   productName?: string | null;
   reviewText: string;
 }): Promise<{ ok: true } | { ok: false; error: string }> {
-  // 1. Enforce the Client-Side Rate Limit (Max 3 per day)
-  const rl = checkClientRateLimit();
-  if (!rl.ok) {
-    return { ok: false, error: `Anda telah mencapai batas pengisian review harian (Maks ${rl.remaining + MAX_PER_DAY}/hari).` };
-  }
-
-  // 2. Validate Input
   if (!input.isAnonymous && !input.name.trim()) {
     return { ok: false, error: "Nama wajib diisi atau centang anonim." };
   }
@@ -75,24 +68,22 @@ export async function submitReview(input: {
   const { data: userResp } = await supabase.auth.getUser();
   const customerId = userResp.user?.id ?? null;
 
-  // 3. Insert into Database
   const { error } = await supabase.from("reviews").insert({
     name: input.isAnonymous ? null : input.name.trim(),
     is_anonymous: input.isAnonymous,
     product_id: input.productId ?? null,
     product_name: input.productName ?? null,
     review_text: text,
-    status: "pending", // Always goes to Admin Dashboard first!
-    customer_id: customerId, // Will be null for guests, which is fine
+    status: "pending",
+    customer_id: customerId,
   });
-
   if (error) return { ok: false, error: error.message };
 
-  // 4. Record the successful submission to local storage
   recordSubmission();
   return { ok: true };
 }
 
+/** Public page — approved reviews only */
 export async function listApprovedReviews(): Promise<ReviewRow[]> {
   const { data, error } = await supabase
     .from("reviews")
@@ -103,6 +94,25 @@ export async function listApprovedReviews(): Promise<ReviewRow[]> {
   return (data ?? []) as ReviewRow[];
 }
 
+/**
+ * Customer account page — only reviews submitted by the currently signed-in user.
+ * Never exposes other users' reviews.
+ */
+export async function listMyReviews(): Promise<ReviewRow[]> {
+  const { data: userResp } = await supabase.auth.getUser();
+  const userId = userResp.user?.id;
+  if (!userId) return [];
+
+  const { data, error } = await supabase
+    .from("reviews")
+    .select("*")
+    .eq("customer_id", userId)
+    .order("created_at", { ascending: false });
+  if (error) return [];
+  return (data ?? []) as ReviewRow[];
+}
+
+/** Admin moderation page — all reviews, all statuses */
 export async function listAllReviews(): Promise<ReviewRow[]> {
   const { data, error } = await supabase
     .from("reviews")
@@ -112,6 +122,7 @@ export async function listAllReviews(): Promise<ReviewRow[]> {
   return (data ?? []) as ReviewRow[];
 }
 
+/** Admin only — update a review's status */
 export async function moderateReview(id: string, status: "approved" | "rejected") {
   const { error } = await supabase
     .from("reviews")
